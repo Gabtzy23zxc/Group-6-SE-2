@@ -1,60 +1,121 @@
-import customtkinter as ctk
+import os
+import json
+import datetime
+import customtkinter as ctk   # type: ignore
 from tkinter import filedialog
+from history import HistoryPage
 
-# Set the theme (light, dark, or system)
-ctk.set_appearance_mode("system")
+ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
-# Create main window
-app = ctk.CTk()
-app.title("Ai-nspect")
-app.geometry("1000x1000")
 
-# Gradient background (simulated using a frame color)
-bg_frame = ctk.CTkFrame(app, fg_color=("lightblue", "#274ad4"), corner_radius=20)
-bg_frame.pack(fill="both", expand=True, padx=10, pady=10)
+class MainPage(ctk.CTk):
+    def __init__(self):
+        super().__init__()
 
-# --- Dropdown Menu ---
-options = ["Model ver. 1.0", "Model ver. 1.0", "Model ver. 1.0", "Add New Model +"]
-selected_option = ctk.StringVar(value=options[0])
+        self.title("AI-nspect")
+        self.geometry("600x400")
+        self.resizable(True,True)
 
-dropdown = ctk.CTkOptionMenu(
-    bg_frame,
-    variable=selected_option,
-    values=options,
-    width=200,
-    corner_radius=10
-)
-dropdown.pack(pady=(30, 10))
+        # --- Gradient background container ---
+        self.bg_frame = ctk.CTkFrame(self, corner_radius=20)
+        self.bg_frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.9, relheight=0.9)
+        self.bg_frame.configure(fg_color="#8EA8FF")  # light blue tone background
 
-# --- View History Button ---
-history_btn = ctk.CTkButton(
-    bg_frame,
-    text="View History",
-    width=100,
-    height=50,
-    corner_radius=10
-)
-history_btn.place(x=20, y=20)
+        # Create frames for main and history
+        self.main_frame = ctk.CTkFrame(self.bg_frame, fg_color="transparent")
+        self.history_page = HistoryPage(self.bg_frame, self.show_main)
 
-# --- Select Image Button ---
-def select_image():
-    file_path = filedialog.askopenfilename(
-        title="Select an Image",
-        filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.gif;*.bmp")]
-    )
-    if file_path:
-        print("Selected:", file_path)
+        for frame in (self.main_frame, self.history_page):
+            frame.place(relwidth=1, relheight=1)
 
-select_btn = ctk.CTkButton(
-    bg_frame,
-    text="Select Image",
-    font=ctk.CTkFont(size=18, weight="bold"),
-    width=180,
-    height=50,
-    corner_radius=20,
-    command=select_image
-)
-select_btn.pack(pady=200)
+        # --- HEADER SECTION ---
+        header = ctk.CTkFrame(self.main_frame, fg_color="transparent", height=60, corner_radius=20)
+        header.pack(fill="x", pady=(10, 20), padx=10)
 
-app.mainloop()
+        # “View History” button
+        view_history_btn = ctk.CTkButton(
+            header,
+            text="View History",
+            fg_color="white",
+            hover_color="#E5E5E5",
+            text_color="black",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            width=100,
+            command=self.show_history
+        )
+        view_history_btn.place(x=10, rely=0.5, anchor="w")
+
+        # Dropdown placeholder (Model version)
+        self.model_var = ctk.StringVar(value="Model ver. 1.0")
+        model_dropdown = ctk.CTkOptionMenu(
+            header,
+            variable=self.model_var,
+            values=["Model ver. 1.0", "Add New Model +"],
+            fg_color="white",
+            text_color="black",
+            button_color="#E5E5E5",
+            dropdown_fg_color="white",
+            dropdown_text_color="black",
+            font=ctk.CTkFont(size=13, weight="bold")
+        )
+        model_dropdown.place(relx=0.95, rely=0.5, anchor="e")
+
+        # --- SELECT IMAGE BUTTON ---
+        select_image_btn = ctk.CTkButton(
+            self.main_frame,
+            text="Select Image",
+            width=180,
+            height=50,
+            font=ctk.CTkFont(size=16, weight="bold"),
+            corner_radius=15,
+            command=self.select_image
+        )
+        select_image_btn.place(relx=0.5, rely=0.6, anchor="center")
+
+        self.show_main()
+
+    # =============================
+    # PAGE SWITCHING
+    # =============================
+    def show_main(self):
+        self.main_frame.tkraise()
+
+    def show_history(self):
+        self.history_page.load_history_data()
+        self.history_page.tkraise()
+
+    # =============================
+    # SELECT IMAGE & SAVE HISTORY
+    # =============================
+    def select_image(self):
+        file_path = filedialog.askopenfilename(
+            title="Select an Image",
+            filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;")]
+        )
+        if file_path:
+            file_name = os.path.basename(file_path)
+            current_time = datetime.datetime.now().strftime("%B %d, %Y %I:%M %p")
+
+            # Load or initialize history
+            history = []
+            if os.path.exists("history.json"):
+                with open("history.json", "r") as f:
+                    try:
+                        history = json.load(f)
+                    except json.JSONDecodeError:
+                        history = []
+
+            # Add new record
+            history.append({"File Name": file_name, "Date": current_time})
+
+            # Save back
+            with open("history.json", "w") as f:
+                json.dump(history, f, indent=4)
+
+            print(f"✅ Added {file_name} at {current_time} to history.")
+
+
+if __name__ == "__main__":
+    app = MainPage()
+    app.mainloop()
