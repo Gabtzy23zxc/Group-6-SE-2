@@ -42,15 +42,17 @@ class HistoryPage(ctk.CTkFrame):
         table_frame = ctk.CTkFrame(self.bg_frame, fg_color="white", corner_radius=15)
         table_frame.pack(fill="both", expand=True, padx=20, pady=(5, 20))
 
-        columns = ("File Name", "Date")
+        columns = ("File Name", "Date","Authenticity","Confidence",)
         self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=10)
         self.tree.heading("File Name", text="File Name")
         self.tree.heading("Date", text="Date")
-
+        self.tree.heading("Authenticity", text="Authenticity")
+        self.tree.heading("Confidence", text="Confidence")
         # Column widths
-        self.tree.column("File Name", width=250, anchor="center")
-        self.tree.column("Date", width=250, anchor="center")
-
+        self.tree.column("File Name", width=125, anchor="center")
+        self.tree.column("Date", width=125, anchor="center")
+        self.tree.column("Authenticity", width=125, anchor="center")
+        self.tree.column("Confidence", width=125, anchor="center")
         # Style the table
         style = ttk.Style()
         style.configure(
@@ -78,6 +80,6 @@ class HistoryPage(ctk.CTkFrame):
             with open("history.json", "r") as f:
                 data = json.load(f)
             for item in data:
-                self.tree.insert("", "end", values=(item["File Name"], item["Date"]))
+                self.tree.insert("", "end", values=(item["File Name"], item["Date"], item["Authenticity"],item["Confidence"]))
         except Exception as e:
             print("Error loading history:", e)

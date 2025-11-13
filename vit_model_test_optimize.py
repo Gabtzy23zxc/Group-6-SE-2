@@ -13,7 +13,7 @@ so.execution_mode = ort.ExecutionMode.ORT_PARALLEL
 session = ort.InferenceSession("ai_detector_v2_optimized.onnx", so, providers=["CPUExecutionProvider"])
 
 processor = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224")
-img = Image.open("fallen.jpg").convert("RGB")
+img = Image.open("image_1.jpg").convert("RGB")
 inputs = processor(img, return_tensors="np")
 
 outputs = session.run(None, {"pixel_values": inputs["pixel_values"]})

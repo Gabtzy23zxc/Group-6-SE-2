@@ -1,18 +1,68 @@
 [
     {
-        "File Name": "chart.png",
-        "Date": "November 12, 2025 10:39 PM"
+        "File Name": "albedo2.jpg",
+        "Date": "November 13, 2025 12:53 AM",
+        "Authenticity": "fake",
+        "Confidence": "55.78 %"
     },
     {
-        "File Name": "albedo-overlord.gif",
-        "Date": "November 12, 2025 11:00 PM"
+        "File Name": "Screenshot_5-9-2025_122536_myportal.cvsu.edu.ph.jpeg",
+        "Date": "November 13, 2025 12:53 AM",
+        "Authenticity": "real",
+        "Confidence": "64.06 %"
+    },
+    {
+        "File Name": "Cunanan_ID_Front.jpeg",
+        "Date": "November 13, 2025 12:54 AM",
+        "Authenticity": "real",
+        "Confidence": "96.92 %"
     },
     {
         "File Name": "albedo2.jpg",
-        "Date": "November 12, 2025 11:01 PM"
+        "Date": "November 13, 2025 11:01 PM",
+        "Authenticity": "Fake",
+        "Confidence": "55.78%"
     },
     {
-        "File Name": "albedo2.jpg",
-        "Date": "November 12, 2025 11:52 PM"
+        "File Name": "Screenshot_5-9-2025_122536_myportal.cvsu.edu.ph.jpeg",
+        "Date": "November 13, 2025 11:01 PM",
+        "Authenticity": "Real",
+        "Confidence": "64.06%"
+    },
+    {
+        "File Name": "Screenshot_5-9-2025_122432_myportal.cvsu.edu.ph (1).jpeg",
+        "Date": "November 13, 2025 11:02 PM",
+        "Authenticity": "Real",
+        "Confidence": "50.67%"
+    },
+    {
+        "File Name": "fallen.jpg",
+        "Date": "November 13, 2025 11:02 PM",
+        "Authenticity": "Real",
+        "Confidence": "99.54%"
+    },
+    {
+        "File Name": "fallen.jpg",
+        "Date": "November 13, 2025 11:09 PM",
+        "Authenticity": "Real",
+        "Confidence": "99.54%"
+    },
+    {
+        "File Name": "fallen.jpg",
+        "Date": "November 13, 2025 11:10 PM",
+        "Authenticity": "Real",
+        "Confidence": "99.54%"
+    },
+    {
+        "File Name": "try2.png",
+        "Date": "November 13, 2025 11:13 PM",
+        "Authenticity": "Real",
+        "Confidence": "99.54%"
+    },
+    {
+        "File Name": "newImage1.png",
+        "Date": "November 13, 2025 11:15 PM",
+        "Authenticity": "Real",
+        "Confidence": "99.10%"
     }
 ]
