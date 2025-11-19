@@ -10,11 +10,10 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 from transformers import AutoImageProcessor
 from history import HistoryPage
+import sys
 
 
-# ==============================
-# THEME SETUP
-# ==============================
+# theme or body color
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
@@ -24,26 +23,26 @@ class MainPage(ctk.CTk):
         super().__init__()
 
         self.title("AI-nspect")
-        self.geometry("600x400")
-        self.resizable(True, True)
+        self.geometry("900x600")
+        self.resizable(False, False)
 
-        # --- Background container ---
+# Background 
         self.bg_frame = ctk.CTkFrame(self, corner_radius=20)
         self.bg_frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.9, relheight=0.9)
         self.bg_frame.configure(fg_color="#8EA8FF")  # light blue background
 
-        # Frames for main and history
+# frame for main and history
         self.main_frame = ctk.CTkFrame(self.bg_frame, fg_color="transparent")
         self.history_page = HistoryPage(self.bg_frame, self.show_main)
 
         for frame in (self.main_frame, self.history_page):
             frame.place(relwidth=1, relheight=1)
 
-        # --- Header ---
+# header
         header = ctk.CTkFrame(self.main_frame, fg_color="transparent", height=60, corner_radius=20)
         header.pack(fill="x", pady=(10, 20), padx=10)
 
-        # “View History” button
+# button for page switching to history page
         view_history_btn = ctk.CTkButton(
             header,
             text="View History",
@@ -55,23 +54,8 @@ class MainPage(ctk.CTk):
             command=self.show_history
         )
         view_history_btn.place(x=10, rely=0.5, anchor="w")
-
-        # Dropdown (Model version)
-        self.model_var = ctk.StringVar(value="Model ver. 1.0")
-        model_dropdown = ctk.CTkOptionMenu(
-            header,
-            variable=self.model_var,
-            values=["Model ver. 1.0", "Add New Model +"],
-            fg_color="white",
-            text_color="black",
-            button_color="#E5E5E5",
-            dropdown_fg_color="white",
-            dropdown_text_color="black",
-            font=ctk.CTkFont(size=13, weight="bold")
-        )
-        model_dropdown.place(relx=0.95, rely=0.5, anchor="e")
-
-        # --- Select Image Button ---
+        
+# button for selecting image
         select_image_btn = ctk.CTkButton(
             self.main_frame,
             text="Select Image",
@@ -85,9 +69,7 @@ class MainPage(ctk.CTk):
 
         self.show_main()
 
-    # =============================
-    # PAGE SWITCHING
-    # =============================
+# this is the function for switching page
     def show_main(self):
         self.main_frame.tkraise()
 
@@ -95,9 +77,7 @@ class MainPage(ctk.CTk):
         self.history_page.load_history_data()
         self.history_page.tkraise()
 
-    # =============================
-    # IMAGE SELECTION + LOADING
-    # =============================
+# select image from directory
     def select_image(self):
         file_path = filedialog.askopenfilename(
             title="Select an Image",
@@ -106,7 +86,7 @@ class MainPage(ctk.CTk):
         if not file_path:
             return
 
-        # 🩵 Fade-in loading overlay
+# animation for loading
         overlay = ctk.CTkFrame(self.bg_frame, fg_color=("gray10", "gray10"), corner_radius=0)
         overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
         box = ctk.CTkFrame(overlay, fg_color="white", corner_radius=20)
@@ -126,7 +106,7 @@ class MainPage(ctk.CTk):
 
         self.update_idletasks()
 
-        # ✨ Fade-in effect for overlay
+# animation 
         def fade_in_overlay(alpha=0.0):
             if alpha < 0.8:
                 overlay.configure(fg_color=(f"gray{int(10 + alpha * 100)}", f"gray{int(10 + alpha * 100)}"))
@@ -134,7 +114,7 @@ class MainPage(ctk.CTk):
 
         fade_in_overlay()
 
-        # --- Threaded Processing ---
+#this is where the ai process the image 
         def process_image():
             try:
                 file_name = os.path.basename(file_path)
@@ -147,8 +127,9 @@ class MainPage(ctk.CTk):
                 so.execution_mode = ort.ExecutionMode.ORT_PARALLEL
 
                 session = ort.InferenceSession("ai_detector_v2_optimized.onnx", so, providers=["CPUExecutionProvider"])
-                processor = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224")
 
+                processor = AutoImageProcessor.from_pretrained("offline_model/models--google--vit-base-patch16-224/snapshots/config")
+                
                 img = Image.open(file_path).convert("RGB")
                 inputs = processor(img, return_tensors="np")
 
@@ -162,7 +143,7 @@ class MainPage(ctk.CTk):
                 confidence_str = f"{confidence:.2f}%"
                 authenticity = labels[label_id].capitalize()
 
-                # --- Save to history ---
+#to save in history.json file
                 history = []
                 if os.path.exists("history.json"):
                     with open("history.json", "r") as f:
@@ -187,7 +168,7 @@ class MainPage(ctk.CTk):
                 print("❌ Error processing image:", e)
 
             finally:
-                # Fade-out overlay before showing results
+# animation for process
                 def fade_out_overlay(alpha=0.8):
                     if alpha > 0:
                         overlay.configure(fg_color=(f"gray{int(10 + alpha * 100)}", f"gray{int(10 + alpha * 100)}"))
@@ -200,22 +181,20 @@ class MainPage(ctk.CTk):
 
         threading.Thread(target=process_image, daemon=True).start()
 
-    # =============================
-    # RESULT DISPLAY FUNCTION
-    # =============================
+# display result
     def display_result(self, file_path, authenticity, confidence_str):
         result_frame = ctk.CTkFrame(self.bg_frame, corner_radius=20)
         result_frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.6, relheight=0.5)
         result_frame.attributes = {"alpha": 0.0}
 
-        # Divide layout: left=image, right=text
+# display image and result in left and right
         left = ctk.CTkFrame(result_frame, fg_color="white", corner_radius=15)
         left.place(relx=0.02, rely=0.5, anchor="w", relwidth=0.45, relheight=0.9)
 
         right = ctk.CTkFrame(result_frame, fg_color="white", corner_radius=15)
         right.place(relx=0.55, rely=0.5, anchor="w", relwidth=0.43, relheight=0.9)
 
-        # 🖼️ Image preview
+# to see preview of image
         try:
             preview = Image.open(file_path)
             preview.thumbnail((200, 200))
@@ -226,9 +205,9 @@ class MainPage(ctk.CTk):
         except Exception as e:
             ctk.CTkLabel(left, text=f"Error loading image:\n{e}", text_color="red").pack(pady=10)
 
-        # 🧠 AI result
+# result color whether ai or not
         color = "#00C853" if authenticity.lower() == "real" else "#FF5252"
-
+# whether its ai or not
         result_label = ctk.CTkLabel(
             right,
             text=f"Authenticity: {authenticity}",
@@ -236,7 +215,7 @@ class MainPage(ctk.CTk):
             font=ctk.CTkFont(size=20, weight="bold")
         )
         result_label.pack(pady=(40, 10))
-
+# confidence on how sure the ai checker on authenticity
         confidence_label = ctk.CTkLabel(
             right,
             text=f"Confidence: {confidence_str}",
@@ -244,7 +223,7 @@ class MainPage(ctk.CTk):
             font=ctk.CTkFont(size=16)
         )
         confidence_label.pack(pady=(0, 20))
-
+# closing button for results
         close_btn = ctk.CTkButton(
             right,
             text="Close",
@@ -258,7 +237,7 @@ class MainPage(ctk.CTk):
 
         result_frame.lift()
 
-        # ✨ Fade-in animation for result card
+# animation for process
         def fade_in(alpha=0.0):
             if alpha < 1.0:
                 try:
@@ -267,8 +246,9 @@ class MainPage(ctk.CTk):
                 except:
                     pass
                 result_frame.place(relx=0.5, rely=0.5, anchor="center")
+                
                 result_frame.attributes["alpha"] = alpha
-                result_frame.configure(fg_color=(f"gray{int(90 - alpha * 80)}", f"gray{int(90 - alpha * 80)}"))
+                result_frame.configure(fg_color="blue")
                 self.after(20, lambda: fade_in(alpha + 0.05))
             else:
                 result_frame.attributes["alpha"] = 1.0
@@ -276,9 +256,8 @@ class MainPage(ctk.CTk):
         fade_in()
 
 
-# ==============================
-# RUN APP
-# ==============================
+# makes the app run
 if __name__ == "__main__":
     app = MainPage()
     app.mainloop()
+    

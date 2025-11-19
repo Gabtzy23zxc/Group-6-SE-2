@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('offline_model', 'offline_model'), ('ai_detector_v2_optimized.onnx', '.'), ('history.json', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
