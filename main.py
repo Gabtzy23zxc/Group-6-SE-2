@@ -125,7 +125,7 @@ class MainPage(ctk.CTk):
                 so.inter_op_num_threads = 1
                 so.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
                 so.execution_mode = ort.ExecutionMode.ORT_PARALLEL
-
+            
                 session = ort.InferenceSession("ai_detector_v2_optimized.onnx", so, providers=["CPUExecutionProvider"])
 
                 processor = AutoImageProcessor.from_pretrained("offline_model/models--google--vit-base-patch16-224/snapshots/config")
@@ -142,7 +142,7 @@ class MainPage(ctk.CTk):
                 confidence = float(probs[0][label_id] * 100)
                 confidence_str = f"{confidence:.2f}%"
                 authenticity = labels[label_id].capitalize()
-
+                
 #to save in history.json file
                 history = []
                 if os.path.exists("history.json"):
