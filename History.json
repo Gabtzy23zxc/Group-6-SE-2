@@ -28,5 +28,11 @@
         "Date": "November 22, 2025 10:44 PM",
         "Authenticity": "Fake",
         "Confidence": "50.19%"
+    },
+    {
+        "File Name": "Document1_Picture 1.png",
+        "Date": "November 23, 2025 10:37 PM",
+        "Authenticity": "Real",
+        "Confidence": "99.41%"
     }
 ]
